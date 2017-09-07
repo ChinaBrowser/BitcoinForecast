@@ -13,19 +13,16 @@ keys = ["price_usd","24h_volume_usd","market_cap_usd","available_supply","total_
 vals = [0]*len(keys)
 
 while True:
-  data = requests.get("https://api.coinmarketcap.com/v1/ticker/bitcoin/").json()[0]
-  bstamp = requests.get("https://www.bitstamp.net/api/v2/ticker/btcusd/").json() 
-  bkc = requests.get("https://blockchain.info/ticker").json()
-  
-  for d in data.keys():
-     if d in keys:
-       indx = keys.index(d)
-       vals[indx] = data[d]
-  for val in vals:
-       f.write(val+",")
-      
-  f.write("{},{},".format(bstamp["volume"],bstamp["vwap"]))
-  f.write("{},{},{}".format(bkc["USD"]["sell"],bkc["USD"]["buy"],bkc["USD"]["15m"]))
-  f.write("\n")
-  f.flush()
-  time.sleep(9*60)
+    data = requests.get("https://api.coinmarketcap.com/v1/ticker/bitcoin/").json()[0]
+    poloniex_data = requests.get("https://poloniex.com/public?command=returnTicker").json()
+    ts = int(time.time())-900
+    ts2 = int(time.time())-86400
+    chart_request = "https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=%d&end=9999999999&period=900" % ts
+    chart_request2 = "https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=%d&end=9999999999&period=86400" % ts2
+    poloniex_chart = requests.get(chart_request).json()[0]
+    poloniex_chart2 = requests.get(chart_request2).json()[0]
+    f.write("{},{},{},{},{},{},{},{},{},{},".format(poloniex_data["USDT_BTC"]["last"],poloniex_data["USDT_BTC"]["quoteVolume"],data["market_cap_usd"],data["total_supply"],data["total_supply"],data["percent_change_1h"],data["percent_change_24h"],data["percent_change_7d"],poloniex_chart2["volume"],poloniex_chart2["weightedAverage"]))
+    f.write("{},{},{}".format(poloniex_data["USDT_BTC"]["lowestAsk"],poloniex_data["USDT_BTC"]["highestBid"],poloniex_chart["close"]))
+    f.write("\n")
+    f.flush()
+    time.sleep(60)
