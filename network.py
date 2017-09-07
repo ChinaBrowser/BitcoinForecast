@@ -10,7 +10,7 @@ from   keras.layers.normalization import BatchNormalization
 
 file_name = 'dataset.csv'
 net = None
-wait_time = 45
+wait_time = 300
 
 def buildNet(w_init="glorot_uniform",act="tanh"):
     global net
@@ -35,7 +35,7 @@ def chart(real,predicted,show=True):
     plt.plot(real,color='g')
     plt.plot(predicted,color='r')
     plt.ylabel('BTC/USD')
-    plt.xlabel("1Minutes")
+    plt.xlabel("5Minutes")
     plt.savefig("chart.png")
     if show:plt.show()
 
@@ -46,10 +46,10 @@ def predictFuture(m1,m2,old_pred,writeToFile=False):
     pred = float(int(pred[0]*100)/100)
     if writeToFile:
         f = open("results","a")
-        f.write("[{}] Actual:{}$ Last Prediction:{}$ Next minute:{}$\n".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
+        f.write("[{}] Actual:{}$ Last Prediction:{}$ Next 5m:{}$\n".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
         f.close()
 
-    print("[{}] Actual:{}$ Last Prediction:{}$ Next minute:{}$".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
+    print("[{}] Actual:{}$ Last Prediction:{}$ Next 5m:{}$".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
     return latest_p,pred
 
 if __name__ == '__main__':

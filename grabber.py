@@ -25,4 +25,4 @@ while True:
     f.write("{},{},{}".format("%.2f" % float(poloniex_data["USDT_BTC"]["lowestAsk"]),"%.2f" % float(poloniex_data["USDT_BTC"]["highestBid"]),"%.2f" % float(poloniex_chart["close"])))
     f.write("\n")
     f.flush()
-    time.sleep(60)
+    time.sleep(5*60)
