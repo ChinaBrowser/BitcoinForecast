@@ -20,10 +20,10 @@ while True:
     for i in range(0,29):
         if bter_trade[i]["type"] == "sell":
             sell = sell + 1
-            sell_sum = sell_sum + bter_trade[i]["amount"]
+            sell_sum = sell_sum + float(bter_trade[i]["amount"])
         else:
             buy = buy + 1
-            buy_sum = buy_sum + bter_trade[i]["amount"]
+            buy_sum = buy_sum + float(bter_trade[i]["amount"])
     
     f.write("{},{},{},{},{},{},{},{},{},{},{},{}".format(bter["last"],bter["lowestAsk"],bter["highestBid"],bter["percentChange"],bter["baseVolume"],bter["quoteVolume"],bter["high24hr"],bter["low24hr"],sell,buy,sell_sum,buy_sum))
     f.write("\n")
