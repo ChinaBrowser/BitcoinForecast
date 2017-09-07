@@ -21,8 +21,8 @@ while True:
     chart_request2 = "https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=%d&end=9999999999&period=86400" % ts2
     poloniex_chart = requests.get(chart_request).json()[0]
     poloniex_chart2 = requests.get(chart_request2).json()[0]
-    f.write("{},{},{},{},{},{},{},{},{},{},".format(poloniex_data["USDT_BTC"]["last"],poloniex_data["USDT_BTC"]["baseVolume"],data["market_cap_usd"],data["total_supply"],data["total_supply"],data["percent_change_1h"],data["percent_change_24h"],data["percent_change_7d"],poloniex_chart2["quoteVolume"],poloniex_chart2["weightedAverage"]))
-    f.write("{},{},{}".format(poloniex_data["USDT_BTC"]["lowestAsk"],poloniex_data["USDT_BTC"]["highestBid"],poloniex_chart["close"]))
+    f.write("{},{},{},{},{},{},{},{},{},{},".format("%.2f" % float(poloniex_data["USDT_BTC"]["last"]),poloniex_data["USDT_BTC"]["baseVolume"],data["market_cap_usd"],data["total_supply"],data["total_supply"],data["percent_change_1h"],data["percent_change_24h"],data["percent_change_7d"],poloniex_chart2["quoteVolume"],"%.2f" % float(poloniex_chart2["weightedAverage"])))
+    f.write("{},{},{}".format("%.2f" % float(poloniex_data["USDT_BTC"]["lowestAsk"]),"%.2f" % float(poloniex_data["USDT_BTC"]["highestBid"]),"%.2f" % float(poloniex_chart["close"])))
     f.write("\n")
     f.flush()
     time.sleep(60)
