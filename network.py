@@ -16,8 +16,8 @@ def buildNet(w_init="glorot_uniform",act="tanh"):
     global net
     print("Building net..",end="")
     net = Sequential()
-    net.add(Dense(12,kernel_initializer=w_init,input_dim=12,activation='linear'))
-    net.add(Reshape((1,12)))
+    net.add(Dense(11,kernel_initializer=w_init,input_dim=11,activation='linear'))
+    net.add(Reshape((1,11)))
     net.add(BatchNormalization())
     net.add(GRU(40,kernel_initializer=w_init,activation=act,return_sequences=True))
     net.add(Dropout(0.4))
@@ -31,25 +31,25 @@ def buildNet(w_init="glorot_uniform",act="tanh"):
     net.compile(optimizer='nadam',loss='mse')
     print("done!")
 
-def chart(real,predicted,show=True):
+def chart(real,predicted,show=False):
     plt.plot(real,color='g')
     plt.plot(predicted,color='r')
-    plt.ylabel('BTC/USD')
+    plt.ylabel('BTC/CNY')
     plt.xlabel("5Minutes")
     plt.savefig("chart.png")
     if show:plt.show()
 
 def predictFuture(m1,m2,old_pred,writeToFile=False):
     actual,latest_p = util.getCurrentData(label=True)
-    actual = np.array(util.reduceCurrent(actual)).reshape(1,12)
+    actual = np.array(util.reduceCurrent(actual)).reshape(1,11)
     pred = util.augmentValue(net.predict(actual)[0],m1,m2)
     pred = float(int(pred[0]*100)/100)
     if writeToFile:
         f = open("results","a")
-        f.write("[{}] Actual:{}$ Last Prediction:{}$ Next 5m:{}$\n".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
+        f.write("[{}] Actual:{}￥ Last Prediction:{}￥ Next 5m:{}￥\n".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
         f.close()
 
-    print("[{}] Actual:{}$ Last Prediction:{}$ Next 5m:{}$".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
+    print("[{}] Actual:{}￥ Last Prediction:{}￥ Next 5m:{}￥".format(time.strftime("%H:%M:%S"),latest_p,old_pred,pred))
     return latest_p,pred
 
 if __name__ == '__main__':
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         reals,preds = [],[]
 
         for i in range(len(data)-40,len(data)):
-            x = np.array(data[i]).reshape(1,12)
+            x = np.array(data[i]).reshape(1,11)
             predicted = util.augmentValue(net.predict(x)[0],m1,m2)[0]
             real = util.augmentValue(labels[i],m1,m2)
             preds.append(predicted)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
         ### Predict all over the dataset to build the chart
         reals,preds = [],[]
         for i in range(len(data)-40,len(data)):
-            x = np.array(data[i]).reshape(1,12)
+            x = np.array(data[i]).reshape(1,11)
             predicted = util.augmentValue(net.predict(x)[0],m1,m2)[0]
             real = util.augmentValue(labels[i],m1,m2)
             preds.append(predicted)
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         preds.append(hip)
 
         ### PLOTTING
-        chart(reals,preds)
+        chart(reals,preds,show=False)
 
     else :
         print("Wrong argument")
