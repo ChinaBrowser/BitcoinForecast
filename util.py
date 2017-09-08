@@ -1,4 +1,5 @@
 import requests
+import time
 
 maxs =[]
 mins =[]
@@ -58,8 +59,9 @@ def getCurrentData(label=False):
     poloniex_chart = requests.get(chart_request).json()[0]
     poloniex_chart2 = requests.get(chart_request2).json()[0]
     vect = []
-    data_15m = "%.2f" % float(poloniex_chart2["weightedAverage"]
-    vect.append("%.2f" % float(poloniex_data["USDT_BTC"]["last"]))
+    data_usdlast = "%.2f" % float(poloniex_data["USDT_BTC"]["last"])
+    data_15m = "%.2f" % float(poloniex_chart2["weightedAverage"])
+    vect.append(float(data_usdlast))
     vect.append(float(poloniex_data["USDT_BTC"]["baseVolume"]))
     vect.append(float(data["market_cap_usd"]))
     vect.append(float(data["total_supply"]))
@@ -69,9 +71,12 @@ def getCurrentData(label=False):
     vect.append(float(data["percent_change_7d"]))
     vect.append(float(poloniex_chart2["quoteVolume"]))
     vect.append(float(data_15m))
-    vect.append("%.2f" % float(poloniex_data["USDT_BTC"]["lowestAsk"]))
-    vect.append("%.2f" % float(poloniex_data["USDT_BTC"]["highestBid"]))
-    vect.append("%.2f" % float(poloniex_chart["close"]))
+    data_usdlowest = "%.2f" % float(poloniex_data["USDT_BTC"]["lowestAsk"])
+    data_usdhighest = "%.2f" % float(poloniex_data["USDT_BTC"]["highestBid"])
+    data_usdclose = "%.2f" % float(poloniex_chart["close"])
+    vect.append(float(data_usdlowest))
+    vect.append(float(data_usdhighest))
+    vect.append(float(data_usdclose))
 
     if label:
         return vect,float(data_15m)
