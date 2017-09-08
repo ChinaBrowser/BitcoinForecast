@@ -4,71 +4,75 @@ maxs =[]
 mins =[]
 
 def loadData(f_name):
-    data  = f_name.read().split("\n")
-    data = data[:len(data)-1]
-    label = []
-    for i in range(len(data)):
-        data[i] = data[i].split(",")
-        data[i] = [float(x) for x in data[i]]
-        label.append(data[i][len(data[i])-1])
-        data[i] = data[i][0:len(data[i])-1]
-    return data[2:],label[:-2]  #Removing first two and last two so each X[i] tries to predict Y[i+2] (i've used i+2 and not to i+1 to force it to predict the future (O) )
+        data    = f_name.read().split("\n")
+        data = data[:len(data)-1]
+        label = []
+        for i in range(len(data)):
+                data[i] = data[i].split(",")
+                data[i] = [float(x) for x in data[i]]
+                label.append(data[i][len(data[i])-1])
+                data[i] = data[i][0:len(data[i])-1]
+        return data[2:],label[:-2]    #Removing first two and last two so each X[i] tries to predict Y[i+2] (i've used i+2 and not to i+1 to force it to predict the future (O) )
 
 def reduceVector(vec,getVal=False):
-    vect = []
-    mx,mn = max(vec),min(vec)
-    mx = mx+mn
-    mn = mn-((mx-mn)*0.4)
-    for x in vec:
-        vect.append((x-mn)/(mx-mn))
-    if not getVal:return vect
-    else:return vect,mx,mn
+        vect = []
+        mx,mn = max(vec),min(vec)
+        mx = mx+mn
+        mn = mn-((mx-mn)*0.4)
+        for x in vec:
+                vect.append((x-mn)/(mx-mn))
+        if not getVal:return vect
+        else:return vect,mx,mn
 
 def reduceValue(x,mx,mn):
-    return (x-mn)/(mx-mn)
+        return (x-mn)/(mx-mn)
 
 def augmentValue(x,mx,mn):
-    return (mx-mn)*x+mn
+        return (mx-mn)*x+mn
 
 def reduceMatRows(data):
-    l = len(data[0])
-    for i in range(l):
-        v = []
-        for t in range(len(data)):
-            v.append(data[t][i])
-        v,mx,mn = reduceVector(v,getVal=True)
-        maxs.append(mx)
-        mins.append(mn)
-        for t in range(len(data)):
-            data[t][i] = v[t]
+        l = len(data[0])
+        for i in range(l):
+                v = []
+                for t in range(len(data)):
+                        v.append(data[t][i])
+                v,mx,mn = reduceVector(v,getVal=True)
+                maxs.append(mx)
+                mins.append(mn)
+                for t in range(len(data)):
+                        data[t][i] = v[t]
 
-    return data
+        return data
 def reduceCurrent(data):
-    for i in range(len(data)):
-        data[i] = reduceValue(data[i],maxs[i],mins[i])
-    return data
+        for i in range(len(data)):
+                data[i] = reduceValue(data[i],maxs[i],mins[i])
+        return data
 
 def getCurrentData(label=False):
-  keys = ["price_usd","24h_volume_usd","market_cap_usd","available_supply","total_supply","percent_change_1h","percent_change_24h","percent_change_7d"]
-  vect = []
-  data = requests.get("https://api.coinmarketcap.com/v1/ticker/bitcoin/").json()[0]
-  bstamp = requests.get("https://www.bitstamp.net/api/v2/ticker/btcusd/").json()
-  bkc = requests.get("https://blockchain.info/ticker").json()
-  '''
-  for i in data.keys():
-    if i in keys:
-      vect.append(float(data[i]))
-  '''
-  for k in keys:
-    for d in data.keys():
-        if k == d:
-            vect.append(float(data[d]))
-    
-  vect.append(float(bstamp["volume"]))
-  vect.append(float(bstamp["vwap"]))
-  vect.append(float(bkc["USD"]["sell"]))
-  vect.append(float(bkc["USD"]["buy"]))
+    data = requests.get("https://api.coinmarketcap.com/v1/ticker/bitcoin/").json()[0]
+    poloniex_data = requests.get("https://poloniex.com/public?command=returnTicker").json()
+    ts = int(time.time())-900
+    ts2 = int(time.time())-86400
+    chart_request = "https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=%d&end=9999999999&period=900" % ts
+    chart_request2 = "https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=%d&end=9999999999&period=86400" % ts2
+    poloniex_chart = requests.get(chart_request).json()[0]
+    poloniex_chart2 = requests.get(chart_request2).json()[0]
+    vect = []
+    data_15m = "%.2f" % float(poloniex_chart2["weightedAverage"]
+    vect.append("%.2f" % float(poloniex_data["USDT_BTC"]["last"]))
+    vect.append(float(poloniex_data["USDT_BTC"]["baseVolume"]))
+    vect.append(float(data["market_cap_usd"]))
+    vect.append(float(data["total_supply"]))
+    vect.append(float(data["total_supply"]))
+    vect.append(float(data["percent_change_1h"]))
+    vect.append(float(data["percent_change_24h"]))
+    vect.append(float(data["percent_change_7d"]))
+    vect.append(float(poloniex_chart2["quoteVolume"]))
+    vect.append(float(data_15m))
+    vect.append("%.2f" % float(poloniex_data["USDT_BTC"]["lowestAsk"]))
+    vect.append("%.2f" % float(poloniex_data["USDT_BTC"]["highestBid"]))
+    vect.append("%.2f" % float(poloniex_chart["close"]))
 
-  if label:
-    return vect,float(bkc["USD"]["15m"])
-  return vect
+    if label:
+        return vect,float(data_15m)
+    return vect
